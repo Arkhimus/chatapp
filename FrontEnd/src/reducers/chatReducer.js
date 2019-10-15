@@ -4,6 +4,7 @@ const defaultState = {
   from: '',
   msg: '',
   topic: '', //room
+  messages: new Array()
 };
 
 // const defaultState = {
@@ -23,6 +24,12 @@ const defaultState = {
 
 const chatReducer = (state = defaultState, action) => {
   switch (action.type) {
+    case "INCOMINGMessage":
+      console.log("action", action)
+      return {
+        ...state,
+        messages: state.messages.concat(action.payload.message)
+      }
     case actionTypes.RECIEVE_MESSAGE_START:
       return {
         ...state, [action.payload.topic]: [

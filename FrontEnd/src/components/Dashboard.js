@@ -1,4 +1,5 @@
 import React from 'react';
+
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Paper from '@material-ui/core/Paper';
 import axios from '../utils/axios_chat';
@@ -20,17 +21,19 @@ class Dashboard extends React.Component {
     this.state = {
       from: '',
       message: '',
-      socket: null,
     }
+    console.log("props", this.props)
+    // this.initSocket();
   }
 
-  initSocket = () => {
-    const socket = io(socketUrl);
-    socket.on('connect', () => {
-      console.log('connected');
-    })
-    this.setState({ socket });
-  }
+  // initSocket = () => {
+  //   const socket = io(socketUrl);
+  //   console.log("socket created")
+  //   socket.on('connect', () => {
+  //     console.log('connected');
+  //   })
+  //   this.setState({ socket });
+  // }
 
   componentDidMount() {
 
@@ -47,20 +50,23 @@ class Dashboard extends React.Component {
       from: this.state.username,
       message: this.state.message,
     };
+    // console.log(this.state.socket);
+    // this.state.socket.emit('message', message);
 
+    this.props.mes(message);
 
-    axios.post('/chat/dashboard', { message })
-      .then(res => {
-        if (res.data.error) {
-          alert('xoxo');
-        } else {
-        //   socket.on('chat-message', message => {
-        //     socket.emit('send-chat-message', message);
-        //   });
-        //   console.log(message)
-        }
-      })
-      .catch();
+    // axios.post('/chat/dashboard', { message })
+    //   .then(res => {
+    //     if (res.data.error) {
+    //       alert('xoxo');
+    //     } else {
+    //     //   socket.on('chat-message', message => {
+    //     //     socket.emit('send-chat-message', message);
+    //     //   });
+    //     //   console.log(message)
+    //     }
+    //   })
+    //   .catch();
     return false;
   }
 
@@ -151,6 +157,9 @@ class Dashboard extends React.Component {
             </form>
           </Paper>
         </main>
+        <div>
+          {this.props.messages.map((e, i) => <p key={i}>{e}</p>)}
+        </div>
       </div>
     );
   }
