@@ -15,33 +15,40 @@ const persistConfig = {
   storage,
 };
 
-const ioInst = io(socketUrl);
+let ioInst = null;
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-let count = 0;
 const middlewareForSockets = store => next => action => {
-  if (action.type === "asd") {
-    count += 1;
-    ioInst.emit('newMessage', action.payload);
-    console.log(count)
-  }
-  ioInst.on('currentMessages', console.log)
-  ioInst.on('messageCreated', message => {
-    store.dispatch({ type: "INCOMINGMessage", payload: message });
-    console.log("message created", message)
-  })
-  let result = next(action)
+  if (window.location.href.includes("Dashboard")) {
+    if (action.type === "asd") {
+      ioInst.emit('newMessage', action.payload);
+    }
 
+  }
+  let result = next(action)
   return result
 }
 
+if (ioInst === null) {
+  ioInst = io(socketUrl);
+}
+
+ioInst.on("currentMessages", messages => {
+  store.dispatch({ type: "INCOMINGMessages", payload: messages })
+})
+
+ioInst.on('messageCreated', message => {
+  store.dispatch({ type: "INCOMINGMessage", payload: message });
+})
 
 
 const store = createStore(persistedReducer, composeWithDevTools(
   applyMiddleware(axiosMiddleware(thunk), middlewareForSockets),
 ));
 
+
+console.log(store);
 const persistor = persistStore(store);
 
 export { store, persistor };
