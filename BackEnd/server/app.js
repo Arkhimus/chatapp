@@ -2,7 +2,7 @@ const cors = require('cors');
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
-const io = require('socket.io')(http);
+const io = require('socket.io')(http, { origins: '*:*' });
 const bodyParser = require('body-parser');
 // const userRoutes = require('./routes/user');
 // const chatRoutes = require('./routes/chat');
@@ -18,15 +18,14 @@ app.use(cors());
 
 // app.use('/user', userRoutes);
 // app.use('/chat', chatRoutes);
-
-let messages = [];
+io.set('origins', '*:*');
 io.on('connection', async (socket) => {
   let actualMessagesInDB = await ChatModel.find({});
   socket.emit('currentMessages', actualMessagesInDB)
   socket.on('newMessage', async (data) => {
     let newMessage = await ChatModel.create({ _id: new mongoose.Types.ObjectId(), message: data.message, roomName: 'Test' });
     await newMessage.save();
-    socket.emit('messageCreated', newMessage);
+    io.emit('messageCreated', newMessage);
   })
   console.log('Socket ID: ' + socket.id);
 });
